@@ -1,0 +1,46 @@
+#include <iostream>
+#include <vector>
+#include <stack>
+
+using namespace std;
+
+int partition(vector<int>& arr, int low, int high) {
+    int pivot = arr[high];
+    int i = low - 1;
+
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i + 1], arr[high]);
+    return i + 1;
+}
+
+void quickSort(vector<int>& arr, int low, int high) {
+    stack<int> st;
+    st.push(low);
+    st.push(high);
+
+    while (!st.empty()) {
+        high = st.top();
+        st.pop();
+        low = st.top();
+        st.pop();
+
+        int pi = partition(arr, low, high);
+
+        if (pi - 1 > low) {
+            st.push(low);
+            st.push(pi - 1);
+        }
+
+        if (pi + 1 < high) {
+            st.push(pi + 1);
+            st.push(high);
+        }
+    }
+}
+
+

@@ -1,0 +1,93 @@
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
+
+// recursive quicksort
+int partition(vector<int>& arr, int low, int high) {
+    int pivot = arr[high];
+    int i = low - 1;
+
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i + 1], arr[high]);
+    return i + 1;
+}
+
+void quickSortRecursive(vector<int>& arr, int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSortRecursive(arr, low, pi - 1);
+        quickSortRecursive(arr, pi + 1, high);
+    }
+}
+
+// non recursive quick sort
+void quickSortNonRecursive(vector<int>& arr, int low, int high) {
+    stack<int> st;
+    st.push(low);
+    st.push(high);
+
+    while (!st.empty()) {
+        high = st.top();
+        st.pop();
+        low = st.top();
+        st.pop();
+
+        int pi = partition(arr, low, high);
+
+        if (pi - 1 > low) {
+            st.push(low);
+            st.push(pi - 1);
+        }
+
+        if (pi + 1 < high) {
+            st.push(pi + 1);
+            st.push(high);
+        }
+    }
+}
+
+void measureTimeRecursive(int n) {
+    vector<int> arr(n);
+    for (int i = 0; i < n; i++) {
+        arr[i] = rand() % n;
+    }
+
+    auto start = high_resolution_clock::now();
+    quickSortRecursive(arr, 0, n - 1);
+    auto end = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>(end - start);
+    cout << "Time taken by recursive quicksort for n = " << n << ": " << duration.count() <<  endl;
+}
+
+void measureTimeNonRecursive(int n) {
+    vector<int> arr(n);
+    for (int i = 0; i < n; i++) {
+        arr[i] = rand() % n;
+    }
+
+    auto start = high_resolution_clock::now();
+    quickSortNonRecursive(arr, 0, n - 1);
+    auto end = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>(end - start);
+    cout << "Time taken by non-recursive quicksort for n = " << n << ": " << duration.count() << endl;
+}
+
+int main() {
+    for (int n = 10000; n <= 100000; n += 10000) {
+        measureTimeRecursive(n);
+        measureTimeNonRecursive(n);
+        cout << endl;
+    }
+    return 0;
+}
